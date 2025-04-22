@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>2025 소방공무원 초과근무 수당 계산기</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    font-family: '맑은 고딕', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    table-layout: fixed;
+}
+
+th, td {
+    border: 1px solid #999;
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+    font-weight: bold;
+}
+
+th {
+    background-color: #cce5ff;
+}
+
+.highlight {
+    background-color: #ff4c4c;
+    color: white;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 15px 0;
+}
+
+input[type="number"] {
+    width: 60px;
+    height: 22px;
+    text-align: center;
+    font-size: 1em;
+    padding: 5px;
+    margin: 0;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border: 1px solid #0056b3;
+}
+
+label {
+    display: block;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.result {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* 계급별 수당 표 스타일 */
+#allowanceTable {
+    width: 800px;
+    table-layout: fixed;
+}
+
+#allowanceTable td span {
+    font-size: 11pt;
+}
+
+#allowanceTable .highlight {
+    background-color: #ff4c4c;
+    color: white;
+}
+
+#allowanceTable .d8ecf3 {
+    background-color: #d8ecf3;
+}
+
+#allowanceTable span small {
+    display: block;
+    font-size: 9pt;
+    color: #555;
+}
+
+body::after {
+    content: "";
+    display: block;
+    height: 100px;
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: calc(100% - 2pt);
+    }
+    table {
+        width: 100%;
+        max-width: none;
+        table-layout: auto;
+    }
+    th, td {
+        padding: 8px;
+        font-size: calc(1em - 2pt);
+    }
+    input[type="number"] {
+        width: 50px;
+        height: 20px;
+        font-size: calc(1em - 2pt);
+    }
+    select {
+        font-size: calc(1em - 2pt);
+    }
+    label {
+        font-size: calc(1.1em - 2pt);
+    }
+    .result {
+        font-size: calc(1.3em - 2pt);
+        padding: 12px 0;
+    }
+    h2 {
+        font-size: calc(1.5em - 2pt);
+        margin: 12px 0;
+    }
+    #allowanceTable {
+        width: 100%;
+        table-layout: auto;
+    }
+    #allowanceTable td span {
+        font-size: 9pt;
+    }
+    #allowanceTable span small {
+        font-size: 7pt;
+    }
+}
+</style>
+</head>
+<body>
+
+<h2>2025년도 소방 초과근무 단가표</h2>
+<table>
+<tr>
+    <th>직종</th><th>계급</th><th>시간외(시간당)</th><th>야간(시간당)</th><th>휴일(일당)</th>
+</tr>
+<tr><td rowspan="6">소방</td><td>소방령</td><td>16,386</td><td>5,462</td><td>131,721</td></tr>
+<tr><td>소방경</td><td>14,572</td><td>4,857</td><td>117,137</td></tr>
+<tr><td>소방위</td><td>13,313</td><td>4,438</td><td>107,018</td></tr>
+<tr><td>소방장</td><td>12,497</td><td>4,166</td><td>100,453</td></tr>
+<tr><td>소방교</td><td>11,145</td><td>3,715</td><td>89,589</td></tr>
+<tr><td>소방사</td><td>10,797</td><td>3,599</td><td>86,791</td></tr>
+</table>
+
+<h2>초과근무수당 계산</h2>
+<table>
+<tr>
+    <td class="highlight">계급</td>
+    <td colspan="5">
+        <select id="rank" onchange="calculate()">
+            <option value="">선택하세요</option>
+            <option value="16386,5462,131721">소방령</option>
+            <option value="14572,4857,117137">소방경</option>
+            <option value="13313,4438,107018">소방위</option>
+            <option value="12497,4166,100453">소방장</option>
+            <option value="11145,3715,89589">소방교</option>
+            <option value="10797,3599,86791">소방사</option>
+        </select>
+    </td>
+</tr>
+<tr>
+    <td class="highlight">시간외</td>
+    <td><label>시간입력</label><input type="number" id="hours" value="0" min="0" onchange="calculate()"></td>
+    <td class="highlight">야간</td>
+    <td><label>시간입력</label><input type="number" id="night" value="0" min="0" onchange="calculate()"></td>
+    <td class="highlight">휴일</td>
+    <td><label>휴일입력</label><input type="number" id="holiday" value="0" min="0" onchange="calculate()"></td>
+</tr>
+<tr>
+    <td>금액</td>
+    <td id="hoursRaw">0</td>
+    <td></td>
+    <td id="nightRaw">0</td>
+    <td></td>
+    <td id="holidayRaw">0</td>
+</tr>
+<tr>
+    <td>원단위 절삭</td>
+    <td id="hoursTotal">0</td>
+    <td></td>
+    <td id="nightTotal">0</td>
+    <td></td>
+    <td id="holidayTotal">0</td>
+</tr>
+<tr>
+    <td colspan="6" class="result">총 액 : <span id="total">0</span> 원</td>
+</tr>
+</table>
+
+<h2>계급별 수당표</h2>
+<table id="allowanceTable">
+<tr style="height: 50px;">
+    <td class="highlight">계급</td>
+    <td colspan="5">
+        <select id="rankAllowance" onchange="updateAllowances()">
+            <option value="">선택하세요</option>
+            <option value="소방감">소방감</option>
+            <option value="소방준감">소방준감</option>
+            <option value="소방정">소방정</option>
+            <option value="소방령">소방령</option>
+            <option value="소방경">소방경</option>
+            <option value="소방위">소방위</option>
+            <option value="소방장">소방장</option>
+            <option value="소방교">소방교</option>
+            <option value="소방사">소방사</option>
+        </select>
+    </td>
+</tr>
+<tr>
+    <td class="d8ecf3">구조구급활동비</td><td id="val1"><span>0</span></td>
+    <td class="d8ecf3">방호활동비</td><td id="val2"><span>0</span></td>
+    <td class="d8ecf3">직책급업무<br>수행경비</td><td id="val3"><span>0</span></td>
+</tr>
+<tr>
+    <td class="d8ecf3">직급보조비</td><td id="val4"><span>0</span></td>
+    <td class="d8ecf3">정액급식비</td><td id="val5"><span>0</span></td>
+    <td class="d8ecf3">위험근무수당</td><td id="val6"><span>0</span></td>
+</tr>
+<tr>
+    <td class="d8ecf3">위험근무수당<br>가산금</td><td id="val7"><span>0</span></td>
+    <td class="d8ecf3">특수직무수당<br>(화재진화)</td><td id="val8"><span>0</span></td>
+    <td class="d8ecf3">중요직무급</td><td id="val9"><span>0</span></td>
+</tr>
+</table>
+
+<script>
+const allowances = {
+    "소방사": ["200,000", "170,000", "0", "175,000", "140,000", "60,000", "10,000", "80,000", "100,000"],
+    "소방교": ["200,000", "170,000", "0", "175,000", "140,000", "60,000", "10,000", "80,000", "100,000"],
+    "소방장": ["200,000", "170,000", "0", "180,000", "140,000", "60,000", "10,000", "80,000", "100,000"],
+    "소방위": ["200,000", "170,000", "0", "185,000", "140,000", "60,000", "10,000", "80,000", "100,000"],
+    "소방경": ["200,000", "170,000", "100,000<br>(센터장, 구조대장)", "185,000", "140,000", "60,000", "10,000", "80,000", "100,000"],
+    "소방령": ["200,000<br>(본서 담당과장)", "170,000", "100,000<br>(본서 과장)", "250,000", "140,000", "60,000", "10,000", "80,000", "150,000"],
+    "소방정": ["0", "170,000", "400,000(본서 서장)<br>350,000(본부 과장)", "400,000", "140,000", "60,000", "10,000", "0", "200,000"],
+    "소방준감": ["0", "0", "600,000", "500,000", "140,000", "60,000", "10,000", "0", "0"],
+    "소방감": ["0", "0", "900,000<br>(본부장)", "650,000", "140,000", "60,000", "10,000", "0", "0"]
+};
+
+function updateAllowances() {
+    const rank = document.getElementById("rankAllowance").value;
+    const vals = allowances[rank] || Array(9).fill("0");
+    vals.forEach((val, idx) => {
+        document.getElementById(`val${idx + 1}`).innerHTML = `<span style="font-size: 9pt;">${val}</span>`;
+    });
+}
+
+function calculate() {
+    const rank = document.getElementById('rank').value;
+    const hours = parseFloat(document.getElementById('hours').value);
+    const night = parseFloat(document.getElementById('night').value);
+    const holiday = parseFloat(document.getElementById('holiday').value);
+    if (!rank) return;
+    const [h, n, ho] = rank.split(',').map(Number);
+    const hoursResult = hours * h;
+    const nightResult = night * n;
+    const holidayResult = holiday * ho;
+    document.getElementById('hoursRaw').innerText = hoursResult.toLocaleString();
+    document.getElementById('nightRaw').innerText = nightResult.toLocaleString();
+    document.getElementById('holidayRaw').innerText = holidayResult.toLocaleString();
+    document.getElementById('hoursTotal').innerText = (Math.floor(hoursResult / 10) * 10).toLocaleString();
+    document.getElementById('nightTotal').innerText = (Math.floor(nightResult / 10) * 10).toLocaleString();
+    document.getElementById('holidayTotal').innerText = (Math.floor(holidayResult / 10) * 10).toLocaleString();
+    const total = Math.floor(hoursResult / 10) * 10 + Math.floor(nightResult / 10) * 10 + Math.floor(holidayResult / 10) * 10;
+    document.getElementById('total').innerText = total.toLocaleString();
+}
+</script>
+
+</body>
+</html>
